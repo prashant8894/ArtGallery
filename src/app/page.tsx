@@ -68,7 +68,29 @@ export default function Home() {
   const spinAngleRef = useRef(0);
   const spinVelocityRef = useRef(18);
   const isCubeHoveredRef = useRef(false);
+  const activeTouchPointerRef = useRef<number | null>(null);
   const cubeRotateY = useMotionValue(0);
+
+  const updateCubeInteraction = (
+    clientX: number,
+    clientY: number,
+    element: HTMLElement
+  ) => {
+    const rect = element.getBoundingClientRect();
+    const x = (clientX - rect.left) / rect.width - 0.5;
+    const y = (clientY - rect.top) / rect.height - 0.5;
+    setParallax({ x, y });
+
+    const now = performance.now();
+    const dx = clientX - lastMouseRef.current.x;
+    const dt = Math.max(now - lastMouseRef.current.time, 16);
+    const velocityX = dx / dt;
+    spinVelocityRef.current = Math.max(
+      -180,
+      Math.min(180, spinVelocityRef.current + velocityX * 48)
+    );
+    lastMouseRef.current = { x: clientX, y: clientY, time: now };
+  };
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -186,25 +208,65 @@ export default function Home() {
               isCubeHoveredRef.current = false;
               setParallax({ x: 0, y: 0 });
             }}
-            onMouseMove={(event) => {
-              const rect = event.currentTarget.getBoundingClientRect();
-              const x = (event.clientX - rect.left) / rect.width - 0.5;
-              const y = (event.clientY - rect.top) / rect.height - 0.5;
-              setParallax({ x, y });
+            onPointerDown={(event) => {
+              if (event.pointerType !== "touch") {
+                return;
+              }
 
-              const now = performance.now();
-              const dx = event.clientX - lastMouseRef.current.x;
-              const dt = Math.max(now - lastMouseRef.current.time, 16);
-              const velocityX = dx / dt;
-              spinVelocityRef.current = Math.max(
-                -180,
-                Math.min(180, spinVelocityRef.current + velocityX * 48)
+              activeTouchPointerRef.current = event.pointerId;
+              isCubeHoveredRef.current = true;
+              event.currentTarget.setPointerCapture(event.pointerId);
+              updateCubeInteraction(
+                event.clientX,
+                event.clientY,
+                event.currentTarget
               );
-              lastMouseRef.current = { x: event.clientX, y: event.clientY, time: now };
+            }}
+            onPointerMove={(event) => {
+              if (event.pointerType === "touch") {
+                if (activeTouchPointerRef.current !== event.pointerId) {
+                  return;
+                }
+                updateCubeInteraction(
+                  event.clientX,
+                  event.clientY,
+                  event.currentTarget
+                );
+                return;
+              }
+
+              updateCubeInteraction(
+                event.clientX,
+                event.clientY,
+                event.currentTarget
+              );
+            }}
+            onPointerUp={(event) => {
+              if (event.pointerType !== "touch") {
+                return;
+              }
+
+              if (activeTouchPointerRef.current === event.pointerId) {
+                activeTouchPointerRef.current = null;
+                isCubeHoveredRef.current = false;
+                setParallax({ x: 0, y: 0 });
+              }
+            }}
+            onPointerCancel={(event) => {
+              if (event.pointerType !== "touch") {
+                return;
+              }
+
+              if (activeTouchPointerRef.current === event.pointerId) {
+                activeTouchPointerRef.current = null;
+                isCubeHoveredRef.current = false;
+                setParallax({ x: 0, y: 0 });
+              }
             }}
             style={{
               width: "clamp(13rem, 40vw, 22rem)",
               height: "clamp(13rem, 40vw, 22rem)",
+              touchAction: "none",
             }}
             aria-label="Featured collection cube"
           >

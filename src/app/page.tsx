@@ -13,10 +13,10 @@ const themes: { id: Theme; label: string }[] = [
 ];
 
 const cubeFaces = [
-  { title: "Koi Pair", image: "/art/fish-pair.png" },
-  { title: "Butterfly Flame", image: "/art/butterfly-candle.png" },
-  { title: "Lotus Muse", image: "/art/lotus-portrait.png" },
-  { title: "Traditional Grace", image: "/art/traditional-portrait.png" },
+  { title: "Koi Pair", image: "art/fish-pair.png" },
+  { title: "Butterfly Flame", image: "art/butterfly-candle.png" },
+  { title: "Lotus Muse", image: "art/lotus-portrait.png" },
+  { title: "Traditional Grace", image: "art/traditional-portrait.png" },
   { title: "Top Plane", image: null },
   { title: "Bottom Plane", image: null },
 ];
@@ -144,7 +144,7 @@ export default function Home() {
             </select>
           </div>
           <a
-            href="/login"
+            href="./login"
             className="rounded-full border border-[var(--foreground)] bg-[var(--surface)]/80 px-5 py-2 text-xs tracking-[0.2em] uppercase backdrop-blur-md transition hover:bg-[var(--foreground)] hover:text-[var(--background)]"
           >
             Login / Join
@@ -322,7 +322,7 @@ export default function Home() {
             </p>
           </div>
           <a
-            href="/login"
+            href="./login"
             className="rounded-full border border-[var(--foreground)] bg-[var(--foreground)] px-7 py-3 text-sm tracking-[0.18em] text-[var(--background)] uppercase transition hover:opacity-85"
           >
             Login / Join
